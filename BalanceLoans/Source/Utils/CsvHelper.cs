@@ -12,7 +12,9 @@ namespace BalanceLoans.Source.Utils
     public class CsvHelper
     {
         protected virtual string CsvDirectory => "large";
-        protected string csvDataRelativePath = AppDomain.CurrentDomain.BaseDirectory + "../../../../BalanceLoans/CsvData/";
+
+        protected string csvDataRelativePath =
+            AppDomain.CurrentDomain.BaseDirectory + "../../../../BalanceLoans/CsvData/";
 
         public IEnumerable<Bank> ReadBanksFromCsv()
         {
@@ -100,7 +102,8 @@ namespace BalanceLoans.Source.Utils
 
         public string GetAssignmentsCsvPath()
         {
-            string fullPathToCsvDirectory = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(csvDataRelativePath), CsvDirectory));
+            string fullPathToCsvDirectory =
+                Path.GetFullPath(Path.Combine(Path.GetDirectoryName(csvDataRelativePath), CsvDirectory));
             return $"{fullPathToCsvDirectory}/results/assignments.csv";
         }
 
@@ -109,14 +112,15 @@ namespace BalanceLoans.Source.Utils
             using (var writer = new StreamWriter(GetYieldsCsvPath()))
             using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
             {
-                yields.OrderBy(x => x.facility_id);
-                csv.WriteRecords(yields);
+                IOrderedEnumerable<Yield> orderedYields = yields.OrderBy(x => x.facility_id);
+                csv.WriteRecords(orderedYields);
             }
         }
 
         public string GetYieldsCsvPath()
         {
-            string fullPathToCsvDirectory = Path.GetFullPath(Path.Combine(Path.GetDirectoryName(csvDataRelativePath), CsvDirectory));
+            string fullPathToCsvDirectory =
+                Path.GetFullPath(Path.Combine(Path.GetDirectoryName(csvDataRelativePath), CsvDirectory));
             return $"{fullPathToCsvDirectory}/results/yields.csv";
         }
     }

@@ -33,10 +33,8 @@ namespace BalanceLoans.Source.Models.Input
                 amount -= amountToWithdraw;
                 return true;
             }
-            else
-            {
-                return false;
-            }
+
+            return false;
         }
     }
 }

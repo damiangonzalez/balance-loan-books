@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using BalanceLoans.Source.Models;
@@ -12,14 +11,15 @@ namespace BalanceLoans.Source.CalcEngines
         public static IEnumerable<Assignment> IdentifyAssignmentsForLoans(InputModels inputModels)
         {
             List<Assignment> assignments = new List<Assignment>();
-            inputModels.loans.OrderBy(x => x.id);
+            IOrderedEnumerable<Loan> orderedLoans = inputModels.loans.OrderBy(x => x.id);
 
-            foreach (Loan loan in inputModels.loans)
+            foreach (Loan loan in orderedLoans)
             {
                 List<int> disqualifyingFacilityIds = IdentifyDisqualifyingFacilityIds(inputModels, loan);
-                List<int> disqualifyingBankIds = IdentifyDisqualifyingBankIds(inputModels, loan); 
-                
-                var qualifyingFacilityIds = IdentifyQualifyingFacilityIds(inputModels, disqualifyingFacilityIds, disqualifyingBankIds);
+                List<int> disqualifyingBankIds = IdentifyDisqualifyingBankIds(inputModels, loan);
+
+                var qualifyingFacilityIds =
+                    IdentifyQualifyingFacilityIds(inputModels, disqualifyingFacilityIds, disqualifyingBankIds);
 
                 if (qualifyingFacilityIds.Any())
                 {
@@ -43,7 +43,7 @@ namespace BalanceLoans.Source.CalcEngines
             return assignments;
         }
 
-        private static List<int> IdentifyQualifyingFacilityIds(InputModels inputModels, 
+        private static List<int> IdentifyQualifyingFacilityIds(InputModels inputModels,
             List<int> disqualifyingFacilityIds,
             List<int> disqualifyingBankIds)
         {
@@ -77,16 +77,10 @@ namespace BalanceLoans.Source.CalcEngines
                 this covenant applies to all of
                 the bank’s facilities.
              */
-            List<int> disqualifyingFacilityIds = new List<int>();
-            foreach (Covenant disqualifyingCovenant in disqualifyingCovenants)
-            {
-                if (disqualifyingCovenant.facility_id != null)
-                {
-                    disqualifyingFacilityIds.Add((int) disqualifyingCovenant.facility_id);
-                }
-            }
 
-            return disqualifyingFacilityIds;
+            return (from disqualifyingCovenant in disqualifyingCovenants
+                where disqualifyingCovenant.facility_id != null
+                select (int) disqualifyingCovenant.facility_id).ToList();
         }
 
         private static List<int> IdentifyDisqualifyingBankIds(InputModels inputModels, Loan loan)
@@ -100,16 +94,10 @@ namespace BalanceLoans.Source.CalcEngines
                 this covenant applies to all of
                 the bank’s facilities.
              */
-            List<int> disqualifyingBankIds = new List<int>();
-            foreach (Covenant disqualifyingCovenant in disqualifyingCovenants)
-            {
-                if (disqualifyingCovenant.facility_id == null)
-                {
-                    disqualifyingBankIds.Add(disqualifyingCovenant.bank_id);
-                }
-            }
 
-            return disqualifyingBankIds;
+            return (from disqualifyingCovenant in disqualifyingCovenants
+                where disqualifyingCovenant.facility_id == null
+                select disqualifyingCovenant.bank_id).ToList();
         }
 
         private static IEnumerable<Covenant> IdentifyDisqualifyingCovenants(InputModels inputModels, Loan loan)
