@@ -7,8 +7,8 @@ How to build and run
 - The `dotnet build` command builds the project and its dependencies into a set of binaries.
 - The `dotnet run --project BalanceLoans` command will run the console application developed in the BalanceLoans project
 - After running the application, the output files will be located at the following paths from the repository root
-   - `BalanceLoans/CsvData/large/results/assignments.csv`
-   - `BalanceLoans/CsvData/large/results/yields.csv`  
+   - [BalanceLoans/CsvData/large/results/assignments.csv](https://github.com/damiangonzalez/balance-loan-books/blob/main/BalanceLoans/CsvData/large/results/assignments.csv)
+   - [BalanceLoans/CsvData/large/results/yields.csv](https://github.com/damiangonzalez/balance-loan-books/blob/main/BalanceLoans/CsvData/large/results/yields.csv)  
 - Sample execution below  
     ```
     damiangonzalez@Damians-MacBook-Pro balance-loan-books % dotnet build                     
@@ -59,9 +59,17 @@ How to build and run
     1,2,default_likelihood,LessThanOrEqual,0.06
     1,2,state,NotEqual,CA`
     ```
-    > In this way, we could easily introduce  new rules based on a predefined set of permissible relationships such as “NotEqual”, “Equal”, “GreaterThan”, “LessThan” etc. Another benefit of this, is that it can also accommodate new fields as the model grows in the future. This approach allows for some more sophisticated relationships as well, such as providing rules that specify both greater than and less than relationships for the same field, if such a constraint was desirable  for a particular facility.  
-   https://stackoverflow.com/questions/6488034/how-to-implement-a-rule-engine  
-   This could be elaborated even further through the support of a domain specific language which could be specified dynamically in the data storage, and then interpreted at runtime against the models being operated on. Using this approach would allow for more complete Expressions to be developed such as
+    > In this way, we could easily introduce  new rules based on a predefined set of permissible relationships such as “NotEqual”, “Equal”, “GreaterThan”, “LessThan” etc. Another benefit of this, is that it can also accommodate new fields as the model grows in the future. This approach allows for some more sophisticated relationships as well, such as providing rules that specify both greater than and less than relationships for the same field, if such a constraint was desirable  for a particular facility. I implementated a prototype of this idea in the following test:  
+   > 
+   > [BalanceLoansTest/RulesTestLoan.cs](https://github.com/damiangonzalez/balance-loan-books/blob/main/BalanceLoansTest/RulesTestLoan.cs)
+   > 
+   > In the test above, you can see that the loans can be evaluated through the runtime compliation of dynamically defined rules such as the following:  
+   > 
+   > `var rule_default_lessthan_09 = new Rule("default_likelihood", "LessThan", "0.09");`  
+   > 
+   > `var rule_state_notequal_CA = new Rule("state", "NotEqual", "CA");`  
+   >
+   > This could be elaborated even further through the support of a domain specific language which could be specified dynamically in the data storage, and then interpreted at runtime against the models being operated on. Using this approach would allow for more complete Expressions to be developed such as
     ```
     facility_id,bank_id,dsl_expression
     2,1,’($default_likelihood * 5) < (.5 * $interest_rate)’`
